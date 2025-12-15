@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Climate-Resilient Housing Cooperative for Seniors in Barrio Logan | BDA 603</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="BDA 603 Smart Cities & Sustainability project by Eddie Rosas: a climate-resilient senior housing cooperative model for Barrio Logan using GIS, demographic analysis, and stakeholder engagement."
+  />
+  <style>
+    :root {
+      --bg-dark: #041421;
+      --bg-accent: #0d3552;
+      --accent: #f4b41a;
+      --accent-soft: rgba(244, 180, 26, 0.16);
+      --text-light: #f9fbff;
+      --text-muted: #d0d9e8;
+      --card-bg: #ffffff;
+      --card-border: #e0e4f0;
+      --max-width: 1080px;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.16);
+      --shadow-card: 0 10px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background-color: #f4f5fb;
+      color: #111827;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ============= Hero ============= */
+
+    .hero {
+      background: radial-gradient(circle at top left, #0d3552 0, #041421 55%);
+      color: var(--text-light);
+      padding: 2.8rem 1.4rem 2.6rem;
+    }
+
+    .hero-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+      gap: 2.4rem;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+      font-size: 2.1rem;
+      line-height: 1.18;
+      margin: 0 0 0.8rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin: 0 0 1.1rem;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1.3rem;
+    }
+
+    .tag {
+      font-size: 0.76rem;
+      padding: 0.32rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(191, 219, 254, 0.7);
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 1.3rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f4b41a, #f8c857);
+      color: #1f2937;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.55);
+      text-decoration: none;
+    }
+
+    .btn-ghost {
+      border-color: rgba(209, 213, 219, 0.5);
+      background-color: rgba(15, 23, 42, 0.45);
+      color: var(--text-light);
+    }
+
+    .btn-ghost:hover {
+      background-color: rgba(15, 23, 42, 0.75);
+      text-decoration: none;
+    }
+
+    .hero-card {
+      background: rgba(6, 22, 39, 0.96);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.4rem 1.2rem;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-card-title {
+      margin: 0 0 0.6rem;
+      font-size: 1.05rem;
+    }
+
+    .hero-metrics {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .hero-metrics li {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-metrics span {
+      min-width: 3.3rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* ========== Main layout ========== */
+
+    main {
+      flex: 1;
+    }
+
+    .section {
+      padding: 2.6rem 1.4rem 2.4rem;
+    }
+
+    .section-alt {
+      background-color: #ffffff;
+    }
+
+    .section-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: grid;
+      gap: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin: 0 0 0.4rem;
+    }
+
+    .section-lead {
+      margin: 0 0 0.9rem;
+      color: #4b5563;
+      font-size: 1rem;
+    }
+
+    .section-grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 1.6rem;
+      align-items: flex-start;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--card-border);
+      padding: 1.3rem 1.4rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      font-size: 1.1rem;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .pill {
+      font-size: 0.78rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background-color: #e5f0ff;
+      color: #1f2933;
+    }
+
+    .key-list {
+      margin: 0.2rem 0 0.8rem 1.1rem;
+      padding: 0;
+    }
+
+    .key-list li {
+      margin-bottom: 0.25rem;
+    }
+
+    .link-list {
+      margin: 0.3rem 0 0.6rem;
+      padding-left: 1.2rem;
+    }
+
+    .link-list li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* ========== Visuals strip ========== */
+
+    .visual-strip {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .visual-card {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--card-border);
+      padding: 1rem 1.1rem;
+      background-color: #f9fafb;
+    }
+
+    .visual-card h4 {
+      margin: 0 0 0.5rem;
+      font-size: 0.98rem;
+    }
+
+    .visual-note {
+      margin: 0;
+      font-size: 0.88rem;
+      color: #4b5563;
+    }
+
+    /* ========== Footer ========== */
+
+    footer {
+      background-color: var(--bg-dark);
+      color: var(--text-muted);
+      padding: 1.3rem 1.4rem;
+    }
+
+    .footer-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .footer-links a {
+      color: var(--text-light);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* ========== Responsive ========== */
+
+    @media (max-width: 880px) {
+      .hero-inner {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .hero {
+        padding-top: 2.1rem;
+      }
+      .section-grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-title {
+        font-size: 1.7rem;
+      }
+      .hero-inner,
+      .section-inner {
+        gap: 1.6rem;
+      }
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- ========= Hero ========= -->
+    <header class="hero">
+      <div class="hero-inner">
+        <div>
+          <p class="hero-eyebrow">BDA 603 · Smart Cities &amp; Sustainability</p>
+          <h1 class="hero-title">
+            Climate-Resilient Housing Cooperative for Seniors in Barrio Logan
+          </h1>
+          <p class="hero-subtitle">
+            A mixed-methods project combining GIS, demographic analysis, heat vulnerability mapping,
+            and stakeholder engagement to design a climate-resilient, community-led housing model
+            for low-income seniors in Barrio Logan, San Diego.
+          </p>
+
+          <div class="hero-tags">
+            <span class="tag">ArcGIS</span>
+            <span class="tag">Heat Vulnerability</span>
+            <span class="tag">Demographic Analysis</span>
+            <span class="tag">SWOT &amp; Stakeholders</span>
+            <span class="tag">Business Model Canvas</span>
+          </div>
+
+          <div class="hero-actions">
+            <a
+              class="btn btn-primary"
+              href="report/ClimateResilient_Housing_FinalDoc.pdf"
+              target="_blank"
+              rel="noopener"
+            >
+              📄 View Final Report (PDF)
+            </a>
+            <a
+              class="btn btn-ghost"
+              href="https://sdsugeo.maps.arcgis.com/apps/dashboards/e6f7ccc0a6ce45c7afcd7cee1ae5eccb"
+              target="_blank"
+              rel="noopener"
+            >
+              🌍 Explore ArcGIS Dashboard
+            </a>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <h2 class="hero-card-title">Project Snapshot</h2>
+          <ul class="hero-metrics">
+            <li><span>Location</span> Barrio Logan, San Diego, CA</li>
+            <li><span>Focus</span> Seniors, climate resilience &amp; displacement risk</li>
+            <li><span>Methods</span> GIS, heat index, socio-demographics, SWOT, BMC</li>
+            <li><span>Course</span> BDA 603 · Smart Cities &amp; Sustainability</li>
+          </ul>
+        </aside>
+      </div>
+    </header>
+
+    <!-- ========= Overview & Methods ========= -->
+    <main>
+      <section class="section section-alt">
+        <div class="section-inner section-grid-2">
+          <div>
+            <h2 class="section-title">Project Overview</h2>
+            <p class="section-lead">
+              This project examines how climate risk, aging, and housing insecurity intersect in
+              Barrio Logan, a historically marginalized and culturally rich neighborhood facing
+              extreme heat and displacement pressures.
+            </p>
+            <p class="section-lead">
+              Using open data, GIS, and community-centered frameworks, the project proposes a
+              climate-resilient senior housing cooperative that aligns with:
+              <strong>SDG 10 (Reduced Inequalities)</strong>,
+              <strong>SDG 11 (Sustainable Cities &amp; Communities)</strong>, and
+              <strong>SDG 13 (Climate Action)</strong>.
+            </p>
+
+            <h3>Key Questions</h3>
+            <ul class="key-list">
+              <li>Where do climate risks and senior vulnerability overlap in Barrio Logan?</li>
+              <li>How many seniors and households are currently at risk of heat and displacement?</li>
+              <li>What city-owned parcels could support resilient senior housing?</li>
+              <li>How can a cooperative model protect seniors while preserving cultural identity?</li>
+            </ul>
+          </div>
+
+          <aside class="card">
+            <h3>Methods &amp; Tools</h3>
+            <ul class="key-list">
+              <li><strong>Spatial Analysis:</strong> ArcGIS Online, zonal statistics, parcel screening</li>
+              <li><strong>Demographics:</strong> ACS enrichment, age structure, rent burden</li>
+              <li><strong>Risk Indicators:</strong> heat severity, senior density, displacement risk</li>
+              <li><strong>Strategy:</strong> SWOT analysis, stakeholder mapping, business model canvas</li>
+            </ul>
+
+            <h4>Tech Stack</h4>
+            <div class="pill-row">
+              <span class="pill">ArcGIS</span>
+              <span class="pill">Esri Living Atlas</span>
+              <span class="pill">Excel / CSV</span>
+              <span class="pill">Qualitative Analysis</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ========= Links & Outputs ========= -->
+      <section class="section">
+        <div class="section-inner section-grid-2">
+          <div>
+            <h2 class="section-title">Interactive Outputs</h2>
+            <p class="section-lead">
+              The project is delivered through a combination of spatial dashboards, narrative report,
+              and advocacy media designed for both technical and non-technical audiences.
+            </p>
+
+            <ul class="link-list">
+              <li>
+                <strong>Final Report:</strong>
+                <a href="report/ClimateResilient_Housing_FinalDoc.pdf" target="_blank" rel="noopener">
+                  Climate-Resilient Housing Cooperative for Seniors in Barrio Logan (PDF)
+                </a>
+              </li>
+              <li>
+                <strong>ArcGIS Dashboard:</strong>
+                <a
+                  href="https://sdsugeo.maps.arcgis.com/apps/dashboards/e6f7ccc0a6ce45c7afcd7cee1ae5eccb"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Barrio Logan Climate &amp; Housing Vulnerability Dashboard
+                </a>
+              </li>
+              <li>
+                <strong>Data Samples:</strong> processed CSVs in the
+                <code>data/</code> folder for age structure, heat layer, and neighborhood indicators.
+              </li>
+            </ul>
+          </div>
+
+          <div class="visual-strip">
+            <div class="visual-card">
+              <h4>What this project demonstrates</h4>
+              <p class="visual-note">
+                &bull; Translating climate and housing data into actionable, neighborhood-scale insights.<br />
+                &bull; Using geospatial tools to identify high-impact, equity-focused interventions.<br />
+                &bull; Framing analytics work inside real-world governance and community dynamics.
+              </p>
+            </div>
+
+            <div class="visual-card">
+              <h4>Skills Highlighted</h4>
+              <div class="pill-row">
+                <span class="pill">GIS &amp; Spatial Thinking</span>
+                <span class="pill">Equity-Centered Analysis</span>
+                <span class="pill">Data Storytelling</span>
+                <span class="pill">Stakeholder Mapping</span>
+                <span class="pill">Sustainable Urban Design Concepts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========= Strategy & Governance ========= -->
+      <section class="section section-alt">
+        <div class="section-inner section-grid-2">
+          <div>
+            <h2 class="section-title">Governance &amp; Stakeholders</h2>
+            <p class="section-lead">
+              The housing cooperative model combines municipal partners, community organizations,
+              and residents to co-govern a climate-resilient senior housing development.
+            </p>
+
+            <h3>Stakeholder Perspectives</h3>
+            <ul class="key-list">
+              <li><strong>Seniors:</strong> safety, affordability, cultural continuity, access to care.</li>
+              <li><strong>City &amp; Agencies:</strong> climate action goals, housing targets, equity.</li>
+              <li><strong>Community Orgs:</strong> anti-displacement, environmental justice, advocacy.</li>
+              <li><strong>Developers / Partners:</strong> funding models, feasibility, long-term operations.</li>
+            </ul>
+          </div>
+
+          <aside class="card">
+            <h3>Strategic Framing</h3>
+            <ul class="key-list">
+              <li><strong>SWOT Analysis:</strong> strengths, weaknesses, opportunities, and threats of a cooperative model in Barrio Logan.</li>
+              <li><strong>Power–Interest Grid:</strong> identifies who must be closely engaged vs. kept informed.</li>
+              <li><strong>Business Model Canvas:</strong> value proposition, key partners, cost structure, and revenue streams for a climate-resilient senior co-op.</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <!-- ========= Footer ========= -->
+    <footer>
+      <div class="footer-inner">
+        <div>
+          © 2025 <strong>Eddie Rosas</strong> · M.S. Big Data Analytics · San Diego State University
+        </div>
+        <div class="footer-links">
+          <a href="mailto:erosas9172@sdsu.edu">Email</a>
+          <a href="https://www.linkedin.com/in/eddierosas21" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://github.com/erosas9172" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
